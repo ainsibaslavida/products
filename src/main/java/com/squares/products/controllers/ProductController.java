@@ -5,7 +5,6 @@ import com.squares.products.models.ProductModel;
 import com.squares.products.repositories.ProductRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,5 +37,19 @@ public class ProductController {
     public ResponseEntity<Object> getOneProduct(@PathVariable(value = "id") UUID productId) {
         Optional<ProductModel> product = productRepository.findById(productId);
         return product.<ResponseEntity<Object>>map(productModel -> ResponseEntity.status(HttpStatus.OK).body(productModel)).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found."));
+    }
+
+    @PutMapping("/products/{id}")
+    public ResponseEntity<Object> updateProduct(@PathVariable(name = "id") UUID id, @RequestBody @Valid ProductRecordDTO productRecordDTO) {
+        Optional<ProductModel> product = this.productRepository.findById(id);
+
+        if (product.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found.");
+        }
+
+        var productModel = product.get();
+
+        BeanUtils.copyProperties(productRecordDTO, productModel);
+        return ResponseEntity.status(HttpStatus.OK).body(productRepository.save(productModel));
     }
 }
