@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -34,13 +33,13 @@ public class ProductController {
     }
 
     @GetMapping("/products/{id}")
-    public ResponseEntity<Object> getOneProduct(@PathVariable(value = "id") UUID productId) {
+    public ResponseEntity<Object> getOneProduct(@PathVariable(value = "id") String productId) {
         Optional<ProductModel> product = productRepository.findById(productId);
         return product.<ResponseEntity<Object>>map(productModel -> ResponseEntity.status(HttpStatus.OK).body(productModel)).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found."));
     }
 
     @PutMapping("/products/{id}")
-    public ResponseEntity<Object> updateProduct(@PathVariable(name = "id") UUID id, @RequestBody @Valid ProductRecordDTO productRecordDTO) {
+    public ResponseEntity<Object> updateProduct(@PathVariable(name = "id") String id, @RequestBody @Valid ProductRecordDTO productRecordDTO) {
         Optional<ProductModel> product = this.productRepository.findById(id);
 
         if (product.isEmpty()) {
@@ -54,7 +53,7 @@ public class ProductController {
     }
 
     @DeleteMapping("/products/{id}")
-    public ResponseEntity<Object> deleteProduct(@PathVariable UUID productId) {
+    public ResponseEntity<Object> deleteProduct(@PathVariable String productId) {
         Optional<ProductModel> product = this.productRepository.findById(productId);
 
         if (product.isEmpty()) {
