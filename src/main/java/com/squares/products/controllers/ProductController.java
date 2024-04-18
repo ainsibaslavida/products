@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+
 @RestController
 @RequiredArgsConstructor
 public class ProductController {
@@ -29,7 +32,19 @@ public class ProductController {
 
     @GetMapping("/products")
     public ResponseEntity<List<ProductModel>> getAllProducts() {
-        return ResponseEntity.status(HttpStatus.OK).body(productRepository.findAll());
+        List<ProductModel> productsList = this.productRepository.findAll();
+
+        if (!productsList.isEmpty()) {
+            for (ProductModel product : productsList) {
+                String id = product.getId();
+                product.add(
+                        linkTo(methodOn(ProductController.class)
+                        .getOneProduct(id))
+                                .withSelfRel());
+            }
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(productsList);
     }
 
     @GetMapping("/products/{id}")
