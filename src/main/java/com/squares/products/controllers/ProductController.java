@@ -50,7 +50,11 @@ public class ProductController {
     @GetMapping("/products/{id}")
     public ResponseEntity<Object> getOneProduct(@PathVariable(value = "id") String productId) {
         Optional<ProductModel> product = productRepository.findById(productId);
-        ProductModel productsList = product.get().add(linkTo(methodOn(ProductController.class).getAllProducts()).withRel("Products list"));
+
+        if (product.isPresent()) {
+            ProductModel productsList = product.get().add(linkTo(methodOn(ProductController.class).getAllProducts()).withRel("Products list"));
+        }
+
         return product.<ResponseEntity<Object>>map(productModel -> ResponseEntity.status(HttpStatus.OK).body(productModel)).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found."));
     }
 
@@ -69,7 +73,7 @@ public class ProductController {
     }
 
     @DeleteMapping("/products/{id}")
-    public ResponseEntity<Object> deleteProduct(@PathVariable String productId) {
+    public ResponseEntity<Object> deleteProduct(@PathVariable(name = "id") String productId) {
         Optional<ProductModel> product = this.productRepository.findById(productId);
 
         if (product.isEmpty()) {
