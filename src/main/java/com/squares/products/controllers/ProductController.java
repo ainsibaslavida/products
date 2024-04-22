@@ -37,10 +37,8 @@ public class ProductController {
         if (!productsList.isEmpty()) {
             for (ProductModel product : productsList) {
                 String id = product.getId();
-                product.add(
-                        linkTo(methodOn(ProductController.class)
-                        .getOneProduct(id))
-                                .withSelfRel());
+                product.add(linkTo(methodOn(ProductController.class).getOneProduct(id))
+                		.withSelfRel());
             }
         }
 
